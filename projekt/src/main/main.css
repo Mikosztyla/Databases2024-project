@@ -1,0 +1,38 @@
+#root{
+    height: 100vh;
+}
+
+/* Styling for links */
+a {
+    text-decoration: none;
+    color: #fff;
+    font-size: 18px;
+    padding: 10px 20px;
+    border-radius: 5px;
+    margin-right: 10px;
+    background-color: #007bff;
+    transition: background-color 0.3s ease;
+  }
+  
+  a:hover {
+    background-color: #0056b3;
+  }
+  
+  /* Container styling */
+  .container {
+    display: flex;
+    justify-content: center;
+    margin-top: 50px;
+    align-items: center;
+    height: 100%;
+  }
+  
+  /* Individual link IDs */
+  #reserv {
+    background-color: #28a745; /* Green color for reservation */
+  }
+  
+  #login {
+    background-color: #ffc107; /* Yellow color for login */
+  }
+  
