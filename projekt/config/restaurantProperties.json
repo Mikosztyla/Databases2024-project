@@ -1,0 +1,6 @@
+{
+  "numberOfTables": 20,
+  "openingTime": "9:00",
+  "closingTime": "22:00",
+  "closedDays": ["2024-12-24", "2024-12-25"]
+}

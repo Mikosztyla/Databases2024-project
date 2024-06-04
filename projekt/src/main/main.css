@@ -2,8 +2,7 @@
     height: 100vh;
 }
 
-/* Styling for links */
-a {
+.container-main a {
     text-decoration: none;
     color: #fff;
     font-size: 18px;
@@ -12,27 +11,25 @@ a {
     margin-right: 10px;
     background-color: #007bff;
     transition: background-color 0.3s ease;
-  }
-  
-  a:hover {
+    width: auto;
+}
+
+.container-main a:hover {
     background-color: #0056b3;
-  }
-  
-  /* Container styling */
-  .container {
+}
+
+.container-main {
     display: flex;
     justify-content: center;
-    margin-top: 50px;
     align-items: center;
     height: 100%;
-  }
-  
-  /* Individual link IDs */
-  #reserv {
-    background-color: #28a745; /* Green color for reservation */
-  }
-  
-  #login {
-    background-color: #ffc107; /* Yellow color for login */
-  }
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+}
+
+#reserv {
+    background-color: #28a745;
+}
   

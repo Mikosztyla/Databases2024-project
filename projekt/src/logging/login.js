@@ -1,20 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contxt/AuthContext';
 import "./login.css"
+import { Link } from 'react-router-dom';
+
 
 export default function Login() {
-  const [loginName, setLoginName] = useState('');
+  const [employeeNumber, setEmployeeNumber] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
   const [registerName, setRegisterName] = useState('');
-  const [registerEmail, setRegisterEmail] = useState('');
+  const [registerSurname, setRegisterSurname] = useState('');
+  const [registerEmployeeNumber, setRegisterEmployeeNumber] = useState('');
   const [registerPassword, setRegisterPassword] = useState('');
+  const [loggedIn, setLoggedIn] = useState(false);
   const [users, setUsers] = useState([]);
-  const { isLoggedIn, login, logout} = useAuth();
 
   // Function to fetch all users from the server
   const fetchUsers = async () => {
     try {
-      const response = await fetch('http://localhost:5000/users');
+      const response = await fetch('http://localhost:5000/employees');
       const data = await response.json();
       setUsers(data);
     } catch (error) {
@@ -24,30 +27,36 @@ export default function Login() {
 
   useEffect(() => {
     fetchUsers(); // Fetch users when the component mounts
-  }, []);
+    if (localStorage.getItem('id') === null) {
+      setLoggedIn(false);
+    } else {
+      setLoggedIn(true);
+    }
+  }, [loggedIn]);
+
+  const setStorage = (data) => {
+    console.log(data.id);
+    localStorage.setItem('id', data.id);
+    setLoggedIn(true);
+  };
 
   // Function to handle login form submission
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
     try {
-      // Send login request
       const response = await fetch('http://localhost:5000/login', {
         method: 'POST',
-        body: JSON.stringify({ name: loginName, password: loginPassword }),
+        body: JSON.stringify({ employee_number: employeeNumber, password: loginPassword }),
         headers: {
           'Content-Type': 'application/json',
         },
       });
       const data = await response.json();
-      console.log(data);
       if (response.ok) {
-        localStorage.setItem('id', data.user.id);
-        localStorage.setItem('email', data.user.email);
-        alert('Login successful');
-        setLoginName('');
+        console.log(data);
+        setStorage(data);
+        setEmployeeNumber('');
         setLoginPassword('');
-        login();
-        fetchUsers();
       } else {
         alert('Invalid credentials');
       }
@@ -61,98 +70,131 @@ export default function Login() {
   const handleRegisterSubmit = async (e) => {
     e.preventDefault();
     try {
-      // Send registration request
-      const response = await fetch('http://localhost:5000/register', {
+      const response = await fetch('http://localhost:5000/employeeAdd', {
         method: 'POST',
-        body: JSON.stringify({ name: registerName, email: registerEmail, password: registerPassword }),
+        body: JSON.stringify({
+          name: registerName,
+          surname: registerSurname,
+          employee_number: registerEmployeeNumber,
+          password: registerPassword,
+        }),
         headers: {
           'Content-Type': 'application/json',
         },
       });
       const data = await response.json();
-      console.warn(data);
       if (response.ok) {
         alert('Registration successful');
-        // Clear input fields
         setRegisterName('');
-        setRegisterEmail('');
+        setRegisterSurname('');
+        setRegisterEmployeeNumber('');
         setRegisterPassword('');
-        // Fetch updated users after successful submission
-        login();
         fetchUsers();
+      } else if (response.status === 409){
+        alert('Numer pracownika musi byc unikalny');
       } else {
-        alert('Failed to register');
+        alert('Błąd dodawania pracownika');
       }
     } catch (error) {
-      console.error('Error submitting data:', error);
       alert('Failed to register');
     }
   };
 
   return (
-    <div className='container'>
+    <div className='container-login'>
       <div className='content'>
-        {!isLoggedIn ? 
-        (
-        <>
-        <h1>Zaloguj się</h1>
-        <form onSubmit={handleLoginSubmit}>
-          <input
-            type="text"
-            placeholder="name"
-            value={loginName}
-            onChange={(e) => setLoginName(e.target.value)}
-          />
-          <input
-            type="password"
-            placeholder="password"
-            value={loginPassword}
-            onChange={(e) => setLoginPassword(e.target.value)}
-          />
-          <button type="submit">Submit</button>
-        </form>
+        <Link to='/' className="back-button">BACK</Link>
+        {!loggedIn ? (
+            <>
+              <h1>Login</h1>
+              <form onSubmit={handleLoginSubmit}>
+                <input
+                    type="number"
+                    placeholder="Employee number"
+                    value={employeeNumber}
+                    onChange={(e) => setEmployeeNumber(e.target.value)}
+                    required
+                />
+                <input
+                    type="password"
+                    placeholder="Password"
+                    value={loginPassword}
+                    onChange={(e) => setLoginPassword(e.target.value)}
+                    required
+                />
+                <button type="submit">Login</button>
+              </form>
+              <h1>Register</h1>
+              <form onSubmit={handleRegisterSubmit}>
+                <input
+                    type="text"
+                    placeholder="Name"
+                    value={registerName}
+                    onChange={(e) => setRegisterName(e.target.value)}
+                    required
+                />
+                <input
+                    type="text"
+                    placeholder="Surname"
+                    value={registerSurname}
+                    onChange={(e) => setRegisterSurname(e.target.value)}
+                    required
+                />
+                <input
+                    type="number"
+                    placeholder="Employee number"
+                    value={registerEmployeeNumber}
+                    onChange={(e) => setRegisterEmployeeNumber(e.target.value)}
+                    required
+                />
+                <input
+                    type="password"
+                    placeholder="Password"
+                    value={registerPassword}
+                    onChange={(e) => setRegisterPassword(e.target.value)}
+                    required
+                />
+                <button type="submit">Register</button>
+              </form>
+            </>
+        ) : (
+            <>
+              <h1>You are logged in as</h1>
+              <h2>employee number: {localStorage.getItem('id')}</h2>
+              <button onClick={() => {
+                localStorage.removeItem('id');
+                setLoggedIn(false);
+                console.log(loggedIn);
+              }}>Logout
+              </button>
+            </>
+        )}
 
-        <h1>Zarejestruj się</h1>
-        <form onSubmit={handleRegisterSubmit}>
-          <input
-            type="text"
-            placeholder="name"
-            value={registerName}
-            onChange={(e) => setRegisterName(e.target.value)}
-          />
-          <input
-            type="email"
-            placeholder="email"
-            value={registerEmail}
-            onChange={(e) => setRegisterEmail(e.target.value)}
-          />
-          <input
-            type="password"
-            placeholder="password"
-            value={registerPassword}
-            onChange={(e) => setRegisterPassword(e.target.value)}
-          />
-          <button type="submit">Submit</button>
-        </form>
-        </>) : <></>}
-
-        {/* Display users */}
-        <div>
-          <h2>Users:</h2>
-          <ul>
-            {users.map((user) => (
-              <li key={user._id}>
-                <strong>{user.name}</strong> - {user.email}
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <div>
-          {isLoggedIn ? (
-            <button onClick={logout}>Logout</button>
-          ): <></>}
-        </div>
+        {users.length > 0 ? (
+          <div className="employee-list">
+            <h2>Employees:</h2>
+            <table className="employee-table">
+              <thead>
+              <tr>
+                <th>Name</th>
+                <th>Surname</th>
+                <th>Employee Number</th>
+              </tr>
+              </thead>
+              <tbody>
+              {users.map((user) => (
+                  <tr key={user._id}>
+                    <td>{user.name}</td>
+                    <td>{user.surname}</td>
+                    <td>{user.employee_number}</td>
+                  </tr>
+              ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <h2>No employees in the system</h2>
+        )}
       </div>
     </div>
   );

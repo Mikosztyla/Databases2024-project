@@ -5,10 +5,12 @@ import "./main.css"
 export default function Main() {
     
     return(
-        <div className='container'>
-        <Link to='/reserv' id='reserv'>REZERWACJA</Link>
-        <Link to='/log' id='log'>LOGOWANIE</Link>
-        <Link to='/reviews' id='reviews'>OPINIE</Link>
+        <div className='container-main'>
+            <Link to='/reserv' id='reserv'>RESERVATIONS</Link>
+            <Link to='/log' id='log'>LOGIN</Link>
+            <Link to='/expenses' id='expenses'>EXPENSES</Link>
+            <Link to='/incomes' id='incomes'>INCOMES</Link>
+            <Link to='/reports' id='reports'>REPORTS</Link>
         </div>
     )
 }

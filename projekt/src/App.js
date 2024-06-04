@@ -4,7 +4,9 @@ import NoPage from './nopage/nopage';
 import Main from "./main/main";
 import Login from "./logging/login";
 import Res from "./reservations/reservation";
-import Reviews from "./review/review";
+import Expenses from "./expenses/expenses";
+import Incomes from "./incomes/incomes";
+import Reports from "./reports/reports";
 
 
 export default function App() {
@@ -16,7 +18,9 @@ export default function App() {
             <Route path="/*" element={<NoPage />} />
             <Route path="/log" element={<Login />} />
             <Route path="/reserv" element={<Res />} />
-            <Route path="/reviews" element={<Reviews />} />
+            <Route path="/incomes" element={<Incomes />} />
+            <Route path="/expenses" element={<Expenses />} />
+            <Route path="/reports" element={<Reports />} />
         </Routes>
       </BrowserRouter>
     </Provider>

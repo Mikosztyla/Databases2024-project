@@ -1,0 +1,58 @@
+.container-reports {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 80%;
+}
+
+.report-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.report-table th, .report-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+}
+
+.report-table th {
+    background-color: #f2f2f2;
+}
+
+.report-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.report-table th, .report-table td {
+    padding: 12px 15px;
+}
+
+.report-table button {
+    margin: 0;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.report-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.report-buttons {
+    display: flex;
+    width: 450px;
+    justify-content: space-around;
+}
+
+.container-reports select {
+    margin: 5px 5px 5px 10px;
+}

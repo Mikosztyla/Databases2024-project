@@ -1,32 +1,105 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contxt/AuthContext';
+import { Link } from "react-router-dom";
+import { format } from 'date-fns';
+import './reservation.css';
 
 export default function Res() {
-  const [tableNumber, setTableNumber] = useState(1);
+  // State variables
+  const [tableNumber, setTableNumber] = useState('');
   const [reservationDate, setReservationDate] = useState('');
-  const [reservationTime, setReservationTime] = useState('8:00');
-  const [reservationDuration, setReservationDuration] = useState(0.5);
+  const [reservationTime, setReservationTime] = useState('');
+  const [client, setClient] = useState('');
+  const [clientToFind, setClientToFind] = useState('');
+  const [reservationDuration, setReservationDuration] = useState(0);
+  const [allReservations, setAllReservations] = useState([]);
+  const [filteredReservations, setFilteredReservations] = useState([]);
+  const [properties, setProperties] = useState(null);
   const { isLoggedIn, login, logout } = useAuth();
 
+  // Initial authentication check
   useEffect(() => {
     const id = localStorage.getItem('id');
     if (id) {
-        login();
+      login();
     } else {
-        logout();
+      logout();
     }
   }, [login, logout]);
 
+  // Fetch reservations and configuration on component mount
+  useEffect(() => {
+    fetchReservations();
+    fetchRestaurantConfiguration();
+  }, []);
+
+  // Set default values when properties are loaded
+  useEffect(() => {
+    if (properties) {
+      console.log(properties);
+    }
+
+    let formattedOpeningTime = "";
+    if (properties){
+      const [hour, minute] = properties?.openingTime.split(':');
+      const formattedHour = hour.padStart(2, '0');
+      formattedOpeningTime = `${formattedHour}:${minute}`;
+    }
+
+    setTableNumber('1');
+    setReservationTime(formattedOpeningTime);
+    setReservationDuration(0.5);
+    setClient('');
+    setReservationDate(format(new Date(), 'yyyy-MM-dd'));
+  }, [properties]);
+
+  // Filter reservations by table number whenever it changes
+  useEffect(() => {
+    filterReservations();
+  }, [tableNumber, allReservations, clientToFind]);
+
+  // Function to filter reservations by table number
+  const filterReservations  = () => {
+    let filtered = allReservations.filter(reservation => reservation.table === tableNumber);
+
+    if (clientToFind) {
+      filtered = filtered.filter(reservation => reservation.client.toLowerCase().includes(clientToFind.toLowerCase()));
+    }
+
+    setFilteredReservations(filtered);
+  };
+
+  // Function to fetch reservations from the server
+  const fetchReservations = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/reservations');
+      if (!response.ok) {
+        throw new Error(`Server error: ${response.status}`);
+      }
+      const reservations = await response.json();
+      setAllReservations(reservations);
+    } catch (error) {
+      console.error('Error fetching reservations:', error);
+    }
+  };
+
+  // Function to fetch restaurant configuration from the server
+  const fetchRestaurantConfiguration = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/config');
+      if (!response.ok) {
+        throw new Error(`Server error: ${response.status}`);
+      }
+      const config = await response.json();
+      setProperties(config[0]);
+    } catch (error) {
+      console.error('Error fetching restaurant configuration:', error);
+    }
+  };
+
+  // Function to handle reservation submission
   const handleReservationSubmit = async (e) => {
     e.preventDefault();
-
-    const selectedDate = new Date(reservationDate);
-    const currentDate = new Date();
-
-    if (selectedDate <= currentDate) {
-      alert('Please select a future date for reservation.');
-      return false;
-    }
 
     const reservationDateTime = new Date(reservationDate);
     const [hour, minute] = reservationTime.split(':').map(Number);
@@ -34,27 +107,40 @@ export default function Res() {
     const endTime = new Date(reservationDateTime);
     const additionalMinutes = reservationDuration * 60;
     endTime.setMinutes(endTime.getMinutes() + additionalMinutes);
-    console.log("reservationDateTime: " + reservationDateTime + "   endTime: " + endTime)
 
-    if (endTime.getHours() >= 22) {
-      alert('Reservations cannot go beyond 10:00 PM.');
+    const currentDate = new Date();
+
+    if (reservationDateTime <= currentDate) {
+      alert('Please select a future date for reservation.');
+      return false;
+    }
+
+    const [closingHour, closingMinute] = properties?.closingTime.split(':').map(Number);
+    const closingDate = new Date(reservationDateTime);
+    closingDate.setHours(closingHour);
+    closingDate.setMinutes(closingMinute);
+
+    if (closingDate < endTime) {
+      alert(`End time cannot exceed closing time: ${properties?.closingTime}`);
       return false;
     }
 
     try {
-      const response = await fetch(`http://localhost:5000/reservations`);
+      const response = await fetch('http://localhost:5000/reservations');
       if (!response.ok) {
         throw new Error(`Server error: ${response.status}`);
       }
       const existingReservations = await response.json();
-      console.log(existingReservations);
-      for (const res of existingReservations) {
-        console.log(res.date + "   " + res.time)
-        const existingStart = new Date(`${res.date}T${res.time}`);
-        const existingEnd = new Date(existingStart);
-        existingEnd.setHours(existingEnd.getHours() + res.duration);
 
-        console.log("ExistingStart: " + existingStart, "   ExistingEnd: " + existingEnd)
+      for (const res of existingReservations) {
+        if (res.table !== tableNumber) continue;
+
+        const existingStart = new Date(res.date);
+        const [existingHour, existingMinute] = res.time.split(':').map(Number);
+        existingStart.setHours(existingHour, existingMinute);
+        const existingEnd = new Date(existingStart);
+        existingEnd.setMinutes(existingEnd.getMinutes() + res.duration * 60);
+
         if (
             (reservationDateTime >= existingStart && reservationDateTime < existingEnd) ||
             (endTime > existingStart && endTime <= existingEnd) ||
@@ -73,28 +159,39 @@ export default function Res() {
     return true;
   };
 
+  // Function to generate time options for the reservation form
   const generateTimeOptions = () => {
     const options = [];
+    if (!properties) return;
+    const [openHour, openMinute] = properties?.openingTime.split(':').map(Number);
+    const [closeHour, closeMinute] = properties?.closingTime.split(':').map(Number);
 
-    for (let hour = 8; hour < 22; hour++) {
-      for (let minute = 0; minute < 60; minute += 30) {
-        const formattedHour = `${hour.toString().padStart(2, '0')}`;
-        const formattedMinute = `${minute.toString().padStart(2, '0')}`;
-        const timeValue = `${formattedHour}:${formattedMinute}`;
-        options.push(
-            <option key={timeValue} value={timeValue}>
-              {timeValue}
-            </option>
-        );
+    let currentHour = openHour;
+    let currentMinute = openMinute;
+
+    while (currentHour < closeHour || (currentHour === closeHour && currentMinute < closeMinute)) {
+      const formattedHour = `${currentHour.toString().padStart(2, '0')}`;
+      const formattedMinute = `${currentMinute.toString().padStart(2, '0')}`;
+      const timeValue = `${formattedHour}:${formattedMinute}`;
+      options.push(
+          <option key={timeValue} value={timeValue}>
+            {timeValue}
+          </option>
+      );
+
+      currentMinute += 30;
+      if (currentMinute >= 60) {
+        currentMinute = 0;
+        currentHour += 1;
       }
     }
 
     return options;
   };
 
+  // Function to generate duration options for the reservation form
   const generateDurationOptions = () => {
     const options = [];
-
     for (let duration = 0.5; duration <= 12; duration += 0.5) {
       options.push(
           <option key={duration} value={duration}>
@@ -106,93 +203,174 @@ export default function Res() {
     return options;
   };
 
+  // Function to generate table options for the reservation form
   const generateTableOptions = () => {
     const options = [];
-
-    for (let number = 1; number <= 10; number += 1){
+    for (let number = 1; number <= (properties?.numberOfTables || 10); number++) {
       options.push(
-          <option key={number} value = {number}>
+          <option key={number} value={number}>
             {number}
           </option>
       );
     }
 
     return options;
-  }
+  };
 
-  const handleResSubmit = async (e) => {
-    e.preventDefault();
-    if (!(await handleReservationSubmit(e))) return;
+  // Function to validate the selected date
+  const validateDate = async (e) => {
+    const selectedDate = e.target.value;
 
-      // console.log(localStorage.getItem('id'));
-    //       // console.log(reservationDate);
-    //       // console.log(reservationTime);
-    //       // console.log(reservationDuration);
-    //       // console.log(tableNumber);
-      try {
-        const response = await fetch('http://localhost:5000/res', {
-          method: 'POST',
-          body: JSON.stringify({
-            user_id: localStorage.getItem('id'),
-            date: reservationDate,
-            time: reservationTime,
-            duration: reservationDuration,
-            table: tableNumber
-          }),
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-        const data = await response.json();
-        if (response.ok) {
-          setReservationDate('')
-          setReservationDuration(0.5)
-          setReservationTime('8:00')
-          setTableNumber(1)
-          alert('Res successful');
-        } else {
-          alert('Res unsuccesful');
-        }
-      } catch (error) {
-        console.error('Error submitting data:', error);
-        alert('Failed to log in');
+    if (properties) {
+      if (properties.closedDays.includes(selectedDate)) {
+        alert('The selected date falls on a closed day.');
+        return;
       }
     }
 
+    setReservationDate(selectedDate);
+  };
+
+  // Function to handle reservation form submission
+  const handleResSubmit = async (e) => {
+    e.preventDefault();
+    console.log(reservationDate);
+    if (!(await handleReservationSubmit(e))) return;
+    try {
+      const response = await fetch('http://localhost:5000/res', {
+        method: 'POST',
+        body: JSON.stringify({
+          employee_id: localStorage.getItem('id').toString(),
+          client: client,
+          date: reservationDate,
+          time: reservationTime,
+          duration: reservationDuration,
+          table: tableNumber.toString(),
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      const data = await response.json();
+      if (response.ok) {
+        fetchReservations();
+        alert('Reservation successful');
+      } else {
+        alert('Reservation unsuccessful');
+      }
+    } catch (error) {
+      console.error('Error submitting data:', error);
+      alert('Failed to make reservation');
+    }
+  };
+
+  // Function to handle reservation deletion
+  const handleDeleteReservation = async (reservationId) => {
+    try {
+      const response = await fetch(`http://localhost:5000/reservations/${reservationId}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) {
+        throw new Error(`Server error: ${response.status}`);
+      }
+      // Remove the deleted reservation from the state
+      setAllReservations(allReservations.filter(reservation => reservation._id !== reservationId));
+      alert('Reservation deleted successfully');
+    } catch (error) {
+      console.error('Error deleting reservation:', error);
+      alert('Failed to delete reservation');
+    }
+  };
+
+  // Sort reservations by date and time
+  const sortedReservations = filteredReservations.slice().sort((a, b) => {
+    const dateTimeA = new Date(`${a.date} ${a.time}`);
+    const dateTimeB = new Date(`${b.date} ${b.time}`);
+    return dateTimeA - dateTimeB;
+  });
+
+  // Render the component
   return (
-    <div>
-      {isLoggedIn ? (
-          <div>
-            <h2>Make a Reservation</h2>
-            <form>
-              <div>
-                <label>Table number: </label>
-                <select value={tableNumber} onChange={(e) => setTableNumber(e.target.value)} required>
-                  {generateTableOptions()}
-                </select>
+      <div className="container-reservations">
+        <Link to="/" className="back-button">BACK</Link>
+        {isLoggedIn ? (
+            <div className="container-logged-in">
+              <div className="reservation-form">
+                <h2>Make a Reservation</h2>
+                <form onSubmit={handleResSubmit}>
+                  <div>
+                    <label>Table number: </label>
+                    <select value={tableNumber} onChange={(e) => setTableNumber(e.target.value)} required>
+                      {generateTableOptions()}
+                    </select>
+                  </div>
+                  <div>
+                    <label>Reservation date: </label>
+                    <input type="date" value={reservationDate} onChange={(e) => validateDate(e)} required/>
+                  </div>
+                  <div>
+                    <label>Reservation time: </label>
+                    <select value={reservationTime} onChange={(e) => setReservationTime(e.target.value)} required>
+                      {generateTimeOptions()}
+                    </select>
+                  </div>
+                  <div>
+                    <label>Reservation duration (hours): </label>
+                    <select value={reservationDuration}
+                            onChange={(e) => setReservationDuration(parseFloat(e.target.value))} required>
+                      {generateDurationOptions()}
+                    </select>
+                  </div>
+                  <div>
+                    <label>Client: </label>
+                    <input type="input" value={client} onChange={(e) => setClient(e.target.value)} required/>
+                  </div>
+                  <button type="submit">Make Reservation</button>
+                </form>
               </div>
-              <div>
-                <label>Reservation date: </label>
-                <input type="date" value={reservationDate} onChange={(e) => setReservationDate(e.target.value)} required />
+
+              <div className="reservation-list">
+                <div>
+                  <label>Find reservations for client: </label>
+                  <input type="input" value={clientToFind} onChange={(e) => setClientToFind(e.target.value)} required/>
+                </div>
+
+                {sortedReservations.length > 0 ? (
+                    <div>
+                      <h2>Reservations for table number: {tableNumber}</h2>
+                      <table>
+                        <thead>
+                        <tr>
+                          <th>Client</th>
+                          <th>Date</th>
+                          <th>Time</th>
+                          <th>Duration</th>
+                          <th>Action</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {sortedReservations.map((reservation, index) => (
+                            <tr key={index}>
+                              <td>{reservation.client}</td>
+                              <td>{reservation.date}</td>
+                              <td>{reservation.time}</td>
+                              <td>{reservation.duration} hours</td>
+                              <td>
+                                <button onClick={() => handleDeleteReservation(reservation._id)}>Delete</button>
+                              </td>
+                            </tr>
+                        ))}
+                        </tbody>
+                      </table>
+                    </div>
+                ) : (
+                    <h2>No reservations for table number: {tableNumber}</h2>
+                )}
               </div>
-              <div>
-                <label>Reservation time: </label>
-                <select value={reservationTime} onChange={(e) => setReservationTime(e.target.value)} required>
-                  {generateTimeOptions()}
-                </select>
-              </div>
-              <div>
-                <label>Reservation duration (hours): </label>
-                <select value={reservationDuration} onChange={(e) => setReservationDuration(parseFloat(e.target.value))} required>
-                  {generateDurationOptions()}
-                </select>
-              </div>
-              <button onClick={handleResSubmit} type="submit">Make Reservation</button>
-            </form>
-          </div>
-      ) : (
-        <p>Please log in to make the reservation</p>
-      )}
-    </div>
+            </div>
+        ) : (
+            <h2>Please log in to make the reservation</h2>
+        )}
+      </div>
   );
 }

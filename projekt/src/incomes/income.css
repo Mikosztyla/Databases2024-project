@@ -1,0 +1,52 @@
+.container-incomes {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 80%;
+}
+
+.container-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.income-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.income-table th, .income-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+}
+
+.income-table th {
+    background-color: #f2f2f2;
+}
+
+.income-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.income-table tr:hover {
+    background-color: #f1f1f1; /* Change this to your desired hover color */
+}
+
+.income-table th, .income-table td {
+    padding: 12px 15px;
+}
+
+.income-table button {
+    margin: 0;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.incomes-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
