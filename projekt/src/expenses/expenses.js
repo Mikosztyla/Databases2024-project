@@ -137,7 +137,7 @@ const ExpenseManager = () => {
                 <input
                     type="number"
                     name="price"
-                    value={formData.price}
+                    value={formData.unit_price}
                     onChange={handleChange}
                     placeholder="Unit Price"
                     autoComplete="off"

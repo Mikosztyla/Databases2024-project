@@ -60,12 +60,12 @@ export default function Res() {
 
   // Function to filter reservations by table number
   const filterReservations  = () => {
-    let filtered = allReservations.filter(reservation => reservation.table === tableNumber);
-
+    let filtered;
     if (clientToFind) {
-      filtered = filtered.filter(reservation => reservation.client.toLowerCase().includes(clientToFind.toLowerCase()));
+      filtered = allReservations.filter(reservation => reservation.client.toLowerCase().includes(clientToFind.toLowerCase()));
+    } else {
+      filtered = allReservations.filter(reservation => reservation.table === tableNumber);
     }
-
     setFilteredReservations(filtered);
   };
 
@@ -337,7 +337,7 @@ export default function Res() {
 
                 {sortedReservations.length > 0 ? (
                     <div>
-                      <h2>Reservations for table number: {tableNumber}</h2>
+                      {!clientToFind ? <h2>Reservations for table number: {tableNumber}</h2> : <></>}
                       <table>
                         <thead>
                         <tr>
