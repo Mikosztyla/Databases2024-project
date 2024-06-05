@@ -1,18 +1,18 @@
 \babel@toc {english}{}\relax 
-\contentsline {section}{\numberline {1}Kolekcje}{2}{section.1}%
-\contentsline {subsection}{\numberline {1.1}Kolekcja employees}{2}{subsection.1.1}%
-\contentsline {subsection}{\numberline {1.2}Kolekcja res}{3}{subsection.1.2}%
-\contentsline {subsection}{\numberline {1.3}Kolekcja expenses}{4}{subsection.1.3}%
-\contentsline {subsection}{\numberline {1.4}Kolekcja incomes}{5}{subsection.1.4}%
-\contentsline {subsection}{\numberline {1.5}Kolekcja properties}{6}{subsection.1.5}%
-\contentsline {section}{\numberline {2}Endpointy}{7}{section.2}%
-\contentsline {subsection}{\numberline {2.1}GET}{7}{subsection.2.1}%
-\contentsline {subsection}{\numberline {2.2}POST}{7}{subsection.2.2}%
-\contentsline {subsection}{\numberline {2.3}PUT}{7}{subsection.2.3}%
-\contentsline {subsection}{\numberline {2.4}DELETE}{7}{subsection.2.4}%
-\contentsline {section}{\numberline {3}Raport}{8}{section.3}%
-\contentsline {section}{\numberline {4}Dyskusja zrealizowanych technik}{10}{section.4}%
-\contentsline {subsection}{\numberline {4.1}Oprogramowanie dla pracowników}{10}{subsection.4.1}%
-\contentsline {subsection}{\numberline {4.2}Tworzenie i logowanie się do konta}{10}{subsection.4.2}%
-\contentsline {subsection}{\numberline {4.3}Trigger przy dodawaniu nowej rezerwacji}{10}{subsection.4.3}%
-\contentsline {subsection}{\numberline {4.4}Możliwość zapisu raportu}{10}{subsection.4.4}%
+\contentsline {section}{\numberline {1}Opis zadania i technik do jego realizacji}{2}{section.1}%
+\contentsline {subsection}{\numberline {1.1}Techniki wykorzystane do realizacji}{2}{subsection.1.1}%
+\contentsline {section}{\numberline {2}Kolekcje}{3}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Kolekcja employees}{3}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}Kolekcja res}{4}{subsection.2.2}%
+\contentsline {subsection}{\numberline {2.3}Kolekcja expenses}{5}{subsection.2.3}%
+\contentsline {subsection}{\numberline {2.4}Kolekcja incomes}{6}{subsection.2.4}%
+\contentsline {subsection}{\numberline {2.5}Kolekcja properties}{7}{subsection.2.5}%
+\contentsline {section}{\numberline {3}Endpointy}{8}{section.3}%
+\contentsline {subsection}{\numberline {3.1}GET}{8}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2}POST}{8}{subsection.3.2}%
+\contentsline {subsection}{\numberline {3.3}PUT}{8}{subsection.3.3}%
+\contentsline {subsection}{\numberline {3.4}DELETE}{8}{subsection.3.4}%
+\contentsline {section}{\numberline {4}Raport}{9}{section.4}%
+\contentsline {section}{\numberline {5}Dyskusja zrealizowanych technik}{11}{section.5}%
+\contentsline {subsection}{\numberline {5.1}Trigger przy dodawaniu nowej rezerwacji}{11}{subsection.5.1}%
+\contentsline {subsection}{\numberline {5.2}Możliwość zapisu raportu}{11}{subsection.5.2}%

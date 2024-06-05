@@ -21,8 +21,6 @@
 \definecolor{darkgray}{rgb}{.4,.4,.4}
 \definecolor{purple}{rgb}{0.65, 0.12, 0.82}
 
-\renewcommand{\lstlistingname}{Przypis}
-
 \lstdefinelanguage{JavaScript}{
   keywords={typeof, new, true, false, catch, function, return, null, catch, switch, var, if, in, while, do, else, case, break},
   keywordstyle=\color{blue}\bfseries,
@@ -65,12 +63,33 @@
     linktoc=all
 }
 \tableofcontents
+
+\newpage
+\section{Opis zadania i technik do jego realizacji}
+Aplikacja obsługuje restaurację i niektóre działania, które mogłyby być przydatne dla jej pracowników. Operacje, które wspiera nasze oprogramowanie to: 
+\begin{itemize}
+	\item rezerwacje - klient dzwoni do pracownika, który nastepnie wprowadza dane do systemu
+	\item dodawanie wydatków - bieżące wydatki przez firmę mogą być wprowadzane przez pracownika
+	\item dodawanie dochodów - po każdej transakcji pracownik również może wprowadzić dochody wraz z niektórymi informacjami odnośnie nich 
+\end{itemize}
+
+Zdecydowalismy się na stworzenie oprogramowania od strony pracowniczej, a nie dla klientów ponieważ jako pracownik mamy większą kontrolę nad wprowadzanymi danymi.
+
+\subsection{Techniki wykorzystane do realizacji}
+todo: screeny frontendu, backendu
+\begin{itemize}
+	\item Front-End - do realizacji front-endu wykorzystaliśmy język JavaScript, a także wykorzystaliśmy framework React
+	\item Backend - backend realizuje skrypt napisany również w JavaScripcie przy użyciu frameworka Express, a do komunikacji z bazą danych został użyty framework Mongoose
+	\item Baza danych - rodzaj bazy danych na jaką się zdecydowaliśmy to nierelacyjna baza MongoDB 
+\end{itemize}
+
 \newpage
 
 \section{Kolekcje}
-
 \begin{samepage}
 \subsection{Kolekcja employees}
+W tej kolekcji przechowujemy dane na temat każdego pracownika. Aplikacja umożliwia logowanie każdego z użytkowników w systemie. Dodatkowo można tworzyć nowe konta.
+todo: zdjęcie danych
 \begin{lstlisting}[caption={Employees}]
 const employeeSchema = new mongoose.Schema({
     name: { type: String, required: true },
@@ -91,6 +110,8 @@ const employeeSchema = new mongoose.Schema({
 \newpage
 \begin{samepage}
 \subsection{Kolekcja res}
+W tej kolekcji znajdują się aktualne rezerwacje na stoliki w restauracji. Na tej kolekcji jest również nałożony dodatkowo trigger, który usuwa stare rezerwacje.
+todo: zdjęcie danych
 \begin{lstlisting}[caption={Reservations}]
 const resSchema = new mongoose.Schema({
     employee_id: { type: String, required: true },
@@ -113,6 +134,8 @@ const resSchema = new mongoose.Schema({
 \newpage
 \begin{samepage}
 \subsection{Kolekcja expenses}
+Kolekcja, w której przechowywane są wydatki firmowe i każdy z pracowników ma możliwośc wprowadzenia danych, które są wykorzystywane w raporcie.
+todo: zdjęcie danych
 \begin{lstlisting}[caption={Expenses}]
 const expenseSchema = new mongoose.Schema({
 	employee_number: { type: Number, required: true },
@@ -122,6 +145,8 @@ const expenseSchema = new mongoose.Schema({
 	date: { type: String, required: true },
 });
 \end{lstlisting}
+Jest to kolekcja, na której wykonywane są wszystkie operacje CRUD.
+todo: opis cruda
 \end{samepage}
 
 \begin{itemize}
@@ -135,6 +160,8 @@ const expenseSchema = new mongoose.Schema({
 \newpage
 \begin{samepage}
 \subsection{Kolekcja incomes}
+Kolekcja, w której przechowywane są przychody dla firmy i każdy z pracowników ma również możliwośc wprowadzenia danych, które są później wykorzystywane w raporcie.
+todo: zdjęcie danych
 \begin{lstlisting}[caption={Incomes}]
 const incomeSchema = new mongoose.Schema({
     employee_number: { type: Number, required: true },
@@ -144,6 +171,7 @@ const incomeSchema = new mongoose.Schema({
 });
 \end{lstlisting}
 Jest to kolekcja, na której wykonywane są wszystkie operacje CRUD.
+todo: opis cruda
 \end{samepage}
 
 \begin{itemize}
@@ -156,6 +184,7 @@ Jest to kolekcja, na której wykonywane są wszystkie operacje CRUD.
 \newpage
 \begin{samepage}
 \subsection{Kolekcja properties}
+todo: zdjęcie danych
 \begin{lstlisting}[caption={Properties}]
 const propertiesSchema = new mongoose.Schema({
     numberOfTables: { type: Number, required: true },
@@ -164,7 +193,6 @@ const propertiesSchema = new mongoose.Schema({
     closedDays: [{ type: String, required: true }]
 });
 \end{lstlisting}
-Jest to kolekcja, na której wykonywane są wszystkie operacje CRUD.
 \end{samepage}
 
 \begin{itemize}
@@ -214,7 +242,7 @@ Jest to kolekcja, na której wykonywane są wszystkie operacje CRUD.
 
 \newpage
 \section{Raport}
-Raport, który umożliwia nasza aplikacja łączy 3 kolekcje: incomes, expenses, employees. Polega on na wygenerowaniu całkowitego obrotu i ilości dodanych rekordów do dwóch pierwszych kolekcji. Zdecydowaliśmy się na taki wybór, ponieważ uważamy, że jest to przydatna i potrzebna informacja dla pracodawcy, który pewnie chciałby mieć wgląd w niektóre dane konkretnych pracowników.
+Raport, który umożliwia nasza aplikacja łączy 3 kolekcje: incomes, expenses, employees. Polega on na wygenerowaniu całkowitego obrotu i ilości dodanych rekordów do dwóch pierwszych kolekcji. Zdecydowaliśmy się na taki wybór, ponieważ uważamy, że jest to przydatna i potrzebna informacja dla pracodawcy, który pewnie chciałby mieć wgląd w niektóre dane konkretnych pracowników. Dodatkowo można uwzględnić konkretny rok i miesiąc, by wygenerować raport dla konkretnej daty.
 
 \begin{lstlisting}[caption={Zapytanie do bazy danych realizujące raport}]
 db.incomes.aggregate([
@@ -286,15 +314,6 @@ db.incomes.aggregate([
 
 \newpage
 \section{Dyskusja zrealizowanych technik}
-\subsection{Oprogramowanie dla pracowników}
-Zdecydowalismy się na stworzenie oprogramowania dla pracowników, a nie dla klientów ponieważ jako pracownik mamy większą kontrolę nad wprowadzanymi danymi.
-Dodatkowo podczas rozmowy na temat projektu pojawił się temat "złego człowieka", klienta który chciałby jak najbardziej uprzykrzyć życie. Zmieniając
-początkowe założenie eliminujemy jego negatywny wpływ na całą aplikacje poprzez zabranie możliwości wykonania ręcznie rezerwacji przez klienta. Klient dzwoni telefonicznie,
-natomiast pracownik wprowadza te dane do systemu.
-
-\subsection{Tworzenie i logowanie się do konta}
-Przy zakładaniu konta pracowniczego nowy pracownik jest proszony o wprowadzenie unikalnego numeru id. Ułatwia to następnie logowanie, a także łatwo można weryfikować,
-który pracownik jakie dane wprowadził do bazy danych.
 
 \subsection{Trigger przy dodawaniu nowej rezerwacji}
 Podczas dodawania nowej rezerwacji, by nie przechowywać zbędnych starych rezerwacji, usuwane są wszystkie rezerwacje, których data jest wcześniejsza niż aktualny dzień. CleanReservations to funkcja, która odpowiada za wyszukanie i usunięcie starych rezerwacji
@@ -307,74 +326,6 @@ Podczas dodawania nowej rezerwacji, by nie przechowywać zbędnych starych rezer
 \subsection{Możliwość zapisu raportu}
 Nasza aplikacja wspiera zapisywanie wygenerowanego raportu do pliku .csv, który można potem łatwo analizować i obrabiać. Zdecydowaliśmy się na to, ponieważ uważamy, że samo wyświetlanie się danych nie byłoby wystarczające dla klienta i na pewno takie usprawnienie zwiększa wygodę używania aplikacji.
 
-
-\iffalse
-dyskusja zrealizowanych technik
-
-1. Zdecydowalismy się na stworzenie oprogramowania dla pracowników, a nie dla klientów ponieważ jako pracownik mamy większą kontrolę nad wprowadzanymi danymi.
-Dodatkowo podczas rozmowy na temat projektu pojawił się temat "złego człowieka", klienta który chciałby jak najbardziej uprzykrzyć życie. Zmieniając
-początkowe założenie eliminujemy jego negatywny wpływ na całą aplikacje poprzez zabranie możliwości wykonania ręcznie rezerwacji przez klienta. Klient dzwoni telefonicznie,
-natomiast pracownik wprowadza te dane do systemu.
-
-2. Przy zakładaniu konta pracowniczego nowy pracownik jest proszony o wprowadzenie unikalnego numeru id. Ułatwia to następnie logowanie, a także łatwo można weryfikować,
-który pracownik jakie dane wprowadził do bazy danych.
-
-dodac info o triggerze
-
-moze jako funkcja od daty???
-db.incomes.aggregate([
-  {
-    $project: {
-      employee_number: 1,
-      price: 1
-    }
-  },
-  {
-    $unionWith: {
-      coll: "expenses",
-      pipeline: [
-        {
-          $project: {
-            employee_number: 1,
-            price: { $multiply: ["$price", "$quantity"]}
-          }
-        }
-      ]
-    }
-  },
-  {
-    $group: {
-      _id: "$employee_number",
-      count: { $sum: 1 },
-      monetary_turnover: {$sum: "$price"}
-    }
-  },
-  {
-    $sort: {
-      count: -1
-    }
-  },
-  {
-    $lookup: {
-      from: "employees",
-      localField: "_id",
-      foreignField: "employee_number",
-      as: "employee_info"
-    }
-  },
-  {
-    $unwind: "$employee_info"
-  },
-  {
-    $project: {
-      "name": "$employee_info.name",
-      "surname": "$employee_info.surname",
-      _id: 0,
-      "count": 1,
-      "monetary_turnover": 1
-    }
-  }
-])
-\fi
+todo: jescze jakies jedno by sie przydalo
 
 \end{document}

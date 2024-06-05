@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2024.6.3)  4 JUN 2024 12:25
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2024.6.3)  5 JUN 2024 18:16
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -964,34 +964,35 @@ LaTeX Font Info:    External font `plex10' loaded for size
  [1
 
 {C:/Users/Michał/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}{C:/Users/Mi
-chał/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/pl/plrm.enc} <./agh.jpg>]
+chał/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/pl/plrm.enc} <./agh.jpg>] [
+2]
 Package hyperref Info: bookmark level for unknown lstlisting defaults to 0 on i
-nput line 72.
+nput line 93.
 LaTeX Font Info:    Trying to load font information for OT4+cmtt on input line 
-72.
+93.
 
 (C:\Users\Michał\AppData\Local\Programs\MiKTeX\tex/latex/polski\ot4cmtt.fd
 File: ot4cmtt.fd 2008/02/24 v1.2.1 Font defs for fonts PL (MW)
 )
 
 LaTeX Font Warning: Font shape `OT4/cmtt/bx/n' in size <10> not available
-(Font)              Font shape `OT4/cmtt/m/n' tried instead on input line 73.
+(Font)              Font shape `OT4/cmtt/m/n' tried instead on input line 94.
 
-[2{C:/Users/Michał/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/pl/pltt.enc}]
-[3] [4] [5] [6]
+[3{C:/Users/Michał/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/pl/pltt.enc}]
+[4] [5] [6] [7]
 
 LaTeX Font Warning: Font shape `OT4/cmtt/bx/n' in size <12> not available
-(Font)              Font shape `OT4/cmtt/m/n' tried instead on input line 179.
+(Font)              Font shape `OT4/cmtt/m/n' tried instead on input line 209.
 
 LaTeX Font Info:    Trying to load font information for OMS+cmtt on input line 
-179.
-LaTeX Font Info:    No file OMScmtt.fd. on input line 179.
+209.
+LaTeX Font Info:    No file OMScmtt.fd. on input line 209.
 
 LaTeX Font Warning: Font shape `OMS/cmtt/bx/n' undefined
 (Font)              using `OMS/cmsy/m/n' instead
-(Font)              for symbol `textbackslash' on input line 179.
+(Font)              for symbol `textbackslash' on input line 209.
 
-[7] [8] [9] [10] (project_report.aux)
+[8] [9] [10] [11] (project_report.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-01-04>
@@ -1001,16 +1002,16 @@ L3 programming layer <2024-01-04>
 LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
 Package rerunfilecheck Info: File `project_report.out' has not changed.
-(rerunfilecheck)             Checksum: 7464654DE5491F145E9BE27090263BBA;2391.
+(rerunfilecheck)             Checksum: 25B5220866BAFEBA1BF91C4AA50B37FD;2437.
  ) 
 Here is how much of TeX's memory you used:
- 14275 strings out of 474486
- 229563 string characters out of 5742812
- 2069542 words of memory out of 5000000
+ 14276 strings out of 474486
+ 229560 string characters out of 5742812
+ 2063542 words of memory out of 5000000
  36244 multiletter control sequences out of 15000+600000
  569724 words of font info for 66 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 75i,6n,79p,438b,1985s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 75i,6n,79p,538b,1985s stack positions out of 10000i,1000n,20000p,200000b,200000s
  <C:\Users\Michał\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\tc
 rm1200.pk><C:/Users/Michał/AppData/Local/Programs/MiKTeX/fonts/type1/public/am
 sfonts/cm/cmsy10.pfb><C:/Users/Michał/AppData/Local/Programs/MiKTeX/fonts/type
@@ -1019,9 +1020,9 @@ pe1/public/pl/plr10.pfb><C:/Users/Michał/AppData/Local/Programs/MiKTeX/fonts/t
 ype1/public/pl/plr12.pfb><C:/Users/Michał/AppData/Local/Programs/MiKTeX/fonts/
 type1/public/pl/pltt10.pfb><C:/Users/Michał/AppData/Local/Programs/MiKTeX/font
 s/type1/public/pl/pltt12.pfb>
-Output written on project_report.pdf (10 pages, 177683 bytes).
+Output written on project_report.pdf (11 pages, 179757 bytes).
 PDF statistics:
- 325 PDF objects out of 1000 (max. 8388607)
- 136 named destinations out of 1000 (max. 500000)
+ 329 PDF objects out of 1000 (max. 8388607)
+ 137 named destinations out of 1000 (max. 500000)
  142 words of extra memory for PDF output out of 10000 (max. 10000000)
 
