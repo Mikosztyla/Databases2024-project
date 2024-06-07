@@ -42,14 +42,14 @@ async function cleanReservations() {
     const day = today.getDate() < 10 ? "0" + today.getDate() : today.getDate();
     const month = today.getMonth() + 1 < 10 ? "0" + (today.getMonth() + 1) : today.getMonth() + 1;
     const dateOfToday = `${today.getFullYear()}-${month}-${day}`;
-    
+
     console.log('Date of Today:', dateOfToday);
-    
+
     try {
-      const result = await Res.deleteMany({ date: { $lt: dateOfToday } });
-      console.log(`${result.deletedCount} old reservations deleted`);
+        const result = await Res.deleteMany({ date: { $lt: dateOfToday } });
+        console.log(`${result.deletedCount} old reservations deleted`);
     } catch (err) {
-      console.error('Error deleting old reservations:', err);
+        console.error('Error deleting old reservations:', err);
     }
 }
 
@@ -178,8 +178,51 @@ app.post("/login", async (req, res) => {
 app.post("/res", async (req, res) => {
     try {
         const { employee_id, date, time, duration, table } = req.body;
+
         if (!employee_id || !date || !time || !duration || !table) {
             return res.status(400).json({ message: 'All fields are required' });
+        }
+
+        const reservationDateTime = new Date(date);
+        const [hour, minute] = time.split(':').map(Number);
+        reservationDateTime.setHours(hour, minute);
+        const endTime = new Date(reservationDateTime);
+        const additionalMinutes = duration * 60;
+        endTime.setMinutes(endTime.getMinutes() + additionalMinutes);
+
+        const currentDate = new Date();
+        if (reservationDateTime <= currentDate) {
+            return res.status(400).json({ message: 'Please select a future date for reservation.' });
+        }
+
+        const properties = await Properties.findOne({});
+        if (properties) {
+            const [closingHour, closingMinute] = properties.closingTime.split(':').map(Number);
+            const closingDate = new Date(reservationDateTime);
+            closingDate.setHours(closingHour);
+            closingDate.setMinutes(closingMinute);
+
+            if (closingDate < endTime) {
+                return res.status(400).json({ message: `End time cannot exceed closing time: ${properties.closingTime}` });
+            }
+        }
+
+        const existingReservations = await Res.find({ date, table });
+
+        for (const existingRes of existingReservations) {
+            const existingStart = new Date(existingRes.date);
+            const [existingHour, existingMinute] = existingRes.time.split(':').map(Number);
+            existingStart.setHours(existingHour, existingMinute);
+            const existingEnd = new Date(existingStart);
+            existingEnd.setMinutes(existingEnd.getMinutes() + existingRes.duration * 60);
+
+            if (
+                (reservationDateTime >= existingStart && reservationDateTime < existingEnd) ||
+                (endTime > existingStart && endTime <= existingEnd) ||
+                (reservationDateTime <= existingStart && endTime >= existingEnd)
+            ) {
+                return res.status(400).json({ message: 'The selected time overlaps with an existing reservation.' });
+            }
         }
 
         const newRes = new Res(req.body);
@@ -460,7 +503,7 @@ app.post('/saveTurnoverData', async (req, res) => {
         const { turnoverData } = req.body;
         const json2csvParser = new Parser();
         const csv = json2csvParser.parse(turnoverData);
-        
+
         const filePath = path.join("../", 'data.csv');
         fs.writeFile(filePath, csv, (err) => {
             if (err) {

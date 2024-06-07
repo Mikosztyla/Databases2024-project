@@ -97,68 +97,6 @@ export default function Res() {
     }
   };
 
-  // Function to handle reservation submission
-  const handleReservationSubmit = async (e) => {
-    e.preventDefault();
-
-    const reservationDateTime = new Date(reservationDate);
-    const [hour, minute] = reservationTime.split(':').map(Number);
-    reservationDateTime.setHours(hour, minute);
-    const endTime = new Date(reservationDateTime);
-    const additionalMinutes = reservationDuration * 60;
-    endTime.setMinutes(endTime.getMinutes() + additionalMinutes);
-
-    const currentDate = new Date();
-
-    if (reservationDateTime <= currentDate) {
-      alert('Please select a future date for reservation.');
-      return false;
-    }
-
-    const [closingHour, closingMinute] = properties?.closingTime.split(':').map(Number);
-    const closingDate = new Date(reservationDateTime);
-    closingDate.setHours(closingHour);
-    closingDate.setMinutes(closingMinute);
-
-    if (closingDate < endTime) {
-      alert(`End time cannot exceed closing time: ${properties?.closingTime}`);
-      return false;
-    }
-
-    try {
-      const response = await fetch('http://localhost:5000/reservations');
-      if (!response.ok) {
-        throw new Error(`Server error: ${response.status}`);
-      }
-      const existingReservations = await response.json();
-
-      for (const res of existingReservations) {
-        if (res.table !== tableNumber) continue;
-
-        const existingStart = new Date(res.date);
-        const [existingHour, existingMinute] = res.time.split(':').map(Number);
-        existingStart.setHours(existingHour, existingMinute);
-        const existingEnd = new Date(existingStart);
-        existingEnd.setMinutes(existingEnd.getMinutes() + res.duration * 60);
-
-        if (
-            (reservationDateTime >= existingStart && reservationDateTime < existingEnd) ||
-            (endTime > existingStart && endTime <= existingEnd) ||
-            (reservationDateTime <= existingStart && endTime >= existingEnd)
-        ) {
-          alert('The selected time overlaps with an existing reservation.');
-          return false;
-        }
-      }
-    } catch (error) {
-      console.error('Error fetching reservations:', error);
-      alert('Failed to validate reservation.');
-      return false;
-    }
-
-    return true;
-  };
-
   // Function to generate time options for the reservation form
   const generateTimeOptions = () => {
     const options = [];
@@ -234,8 +172,7 @@ export default function Res() {
   // Function to handle reservation form submission
   const handleResSubmit = async (e) => {
     e.preventDefault();
-    console.log(reservationDate);
-    if (!(await handleReservationSubmit(e))) return;
+
     try {
       const response = await fetch('http://localhost:5000/res', {
         method: 'POST',
@@ -251,16 +188,16 @@ export default function Res() {
           'Content-Type': 'application/json',
         },
       });
-      const data = await response.json();
       if (response.ok) {
         fetchReservations();
         alert('Reservation successful');
       } else {
-        alert('Reservation unsuccessful');
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Server error');
       }
     } catch (error) {
       console.error('Error submitting data:', error);
-      alert('Failed to make reservation');
+      alert(error.message);
     }
   };
 
