@@ -89,7 +89,6 @@ todo: screeny frontendu, backendu
 \begin{samepage}
 \subsection{Kolekcja employees}
 W tej kolekcji przechowujemy dane na temat każdego pracownika. Aplikacja umożliwia logowanie każdego z użytkowników w systemie. Dodatkowo można tworzyć nowe konta.
-todo: zdjęcie danych
 \begin{lstlisting}[caption={Employees}]
 const employeeSchema = new mongoose.Schema({
     name: { type: String, required: true },
@@ -107,11 +106,24 @@ const employeeSchema = new mongoose.Schema({
 	\item \textbf{password} - hasło konta pracownika
 \end{itemize}
 
+\subsubsection{Przykładowe dane}
+\begin{lstlisting}[]
+ {
+    _id: ObjectId('66546fb68e7f68d20e761563'),
+    name: 'Michal',
+    surname: 'Dydek',
+    employee_number: 1,
+    password: 'test',
+    __v: 0
+ }
+\end{lstlisting}
+
+
 \newpage
 \begin{samepage}
 \subsection{Kolekcja res}
 W tej kolekcji znajdują się aktualne rezerwacje na stoliki w restauracji. Na tej kolekcji jest również nałożony dodatkowo trigger, który usuwa stare rezerwacje.
-todo: zdjęcie danych
+
 \begin{lstlisting}[caption={Reservations}]
 const resSchema = new mongoose.Schema({
     employee_id: { type: String, required: true },
@@ -130,6 +142,20 @@ const resSchema = new mongoose.Schema({
 	\item \textbf{duration} - długość rezerwacji
 	\item \textbf{table} - numer stolika, którego dotyczy rezerwacja
 \end{itemize}
+
+\subsubsection{Przykładowe dane}
+\begin{lstlisting}[]
+ {
+	_id: ObjectId('665d9a1589f261518c10c452'),
+    employee_id: '1',
+    client: 'Gosztyla',
+    date: '2024-06-20',
+    time: '09:00',
+    duration: 0.5,
+    table: '1',
+    __v: 0
+ }
+\end{lstlisting}
 
 \newpage
 \begin{samepage}
@@ -157,6 +183,19 @@ todo: opis cruda
 	\item \textbf{date} - data wydatku
 \end{itemize}
 
+\subsubsection{Przykładowe dane}
+\begin{lstlisting}[]
+ {
+    _id: ObjectId('665475238e7f68d20e76158a'),
+    employee_number: 3,
+    item: 'paluszki',
+    quantity: 10,
+    price: 20,
+    date: '2024-06-02',
+    __v: 0
+ }
+\end{lstlisting}
+
 \newpage
 \begin{samepage}
 \subsection{Kolekcja incomes}
@@ -181,6 +220,18 @@ todo: opis cruda
 	\item \textbf{date} - data wpływu
 \end{itemize}
 
+\subsubsection{Przykładowe dane}
+\begin{lstlisting}[]
+ {
+    _id: ObjectId('6654c95943ee7b58959a5aba'),
+    employee_number: 2,
+    order_id: '29283',
+    price: 30,
+    date: '2024-05-30',
+    __v: 0
+ }
+\end{lstlisting}
+
 \newpage
 \begin{samepage}
 \subsection{Kolekcja properties}
@@ -201,6 +252,18 @@ const propertiesSchema = new mongoose.Schema({
 	\item \textbf{closingTime} - godzina zamknięcia restauracji
 	\item \textbf{closedDays} - dni, w które restauracja będzie zamknięta
 \end{itemize}
+
+\subsubsection{Przykładowe dane}
+\begin{lstlisting}[]
+ {
+    _id: ObjectId('6662b86ce7563e909d776e99'),
+    numberOfTables: 20,
+    openingTime: '9:00',
+    closingTime: '22:00',
+    closedDays: [ '2024-12-24', '2024-12-25' ],
+    __v: 0
+ }
+\end{lstlisting}
 
 \newpage
 \section{Endpointy}
@@ -311,6 +374,305 @@ db.incomes.aggregate([
 }
 ])
 \end{lstlisting}
+
+
+\newpage
+\section{Używanie oprogramowania}
+\subsection{Strona główna}
+
+\begin{minipage}{\textwidth}
+\noindent Widok strony głównej:
+\begin{center}
+\includegraphics[width=\textwidth]{media/mainPage.png}
+\end{center}
+\end{minipage}
+
+\newpage
+\subsection{Reservations}
+\begin{minipage}{\textwidth}
+\noindent Po wciśnięciu przycisku \textbf{Reservations}:
+\begin{center}
+\includegraphics[width=\textwidth]{media/Reservations.png}
+\end{center}
+\end{minipage}
+
+\begin{minipage}{\textwidth}
+\noindent Przenosimy się do panelu rezerwacji:
+\begin{center}
+\includegraphics[width=\textwidth]{media/Reservations_in.png}
+\end{center}
+\end{minipage}
+
+\begin{minipage}{\textwidth}
+\noindent Po wypełnieniu danych o rezerwacji klienta, możemy spóbować dodać taką rezerwację, za pomocą przycisku \textbf{Make Reservation}:
+\begin{center}
+\includegraphics[width=\textwidth]{media/Reservations_makeReservations.png}
+\end{center}
+\end{minipage}
+
+\begin{minipage}{\textwidth}
+\noindent Jeśli dane rezerwacji są poprawne, dostaniemy komunikat o poprawnym dodaniu rezerwacji:
+\begin{center}
+\includegraphics[width=\textwidth]{media/Reservations_makeReservationsAlert.png}
+\end{center}
+\end{minipage}
+
+\begin{minipage}{\textwidth}
+\noindent Rezerwacja następnie będzie dostępna w widoku rezerwacji dla wybranego stolika:
+\begin{center}
+\includegraphics[width=\textwidth]{media/Reservations_addedReservation.png}
+\end{center}
+\end{minipage}
+
+\begin{minipage}{\textwidth}
+\noindent Jeśli wybraliśmy termin rezerwacji w przeszłości, to nie będziemy mogli dokonać rezerwacji:
+\begin{center}
+\includegraphics[width=\textwidth]{media/Reservations_previousDate.png}
+\end{center}
+\end{minipage}
+
+\begin{minipage}{\textwidth}
+\noindent Jeśli wybraliśmy termin rezerwacji, który kończy się po zamknięciu rezerwacji, dostaniemy komunikat:
+\begin{center}
+\includegraphics[width=\textwidth]{media/Reservations_tooLong.png}
+\end{center}
+\end{minipage}
+
+\begin{minipage}{\textwidth}
+\noindent Jeśli wybraliśmy termin rezerwacji, który jakkolwiek nachodzi na inną rezerwację, dokonaną na ten sam stolik, dostaniemy komunikat:
+\begin{center}
+\includegraphics[width=\textwidth]{media/Reservations_overlap.png}
+\end{center}
+\end{minipage}
+
+\begin{minipage}{\textwidth}
+\noindent Mamy również możliwość usunięcia rezerwacji:
+\begin{center}
+\includegraphics[width=\textwidth]{media/Reservation_delete.png}
+\end{center}
+\end{minipage}
+
+\begin{minipage}{\textwidth}
+\noindent Po usunięciu dostaniemy komunikat:
+\begin{center}
+\includegraphics[width=\textwidth]{media/Reservations_delete_successfull.png}
+\end{center}
+\end{minipage}
+
+\begin{minipage}{\textwidth}
+\noindent Mamy również możliwość wyszukania wszystkich rezerwacji, dla danego klienta:
+\begin{center}
+\includegraphics[width=\textwidth]{media/Reservations_searchClient.png}
+\end{center}
+\end{minipage}
+
+\newpage
+\subsection{Login}
+\begin{minipage}{\textwidth}
+\noindent Po wciśnięciu przycisku \textbf{Login}:
+\begin{center}
+\includegraphics[width=\textwidth]{media/Login.png}
+\end{center}
+\end{minipage}
+
+\begin{minipage}{\textwidth}
+\noindent Przenosimy się do panelu logowania:
+\begin{center}
+\includegraphics[width=\textwidth]{media/Login_in.png}
+\end{center}
+\end{minipage}
+
+\begin{minipage}{\textwidth}
+\noindent Możemy zalogować się na istniejące konto pracownicze:
+\begin{center}
+\includegraphics[width=\textwidth]{media/Login_login.png}
+\end{center}
+\end{minipage}
+
+\begin{minipage}{\textwidth}
+\noindent Po podaniu poprawnych danych, zostajemy zalogowani:
+\begin{center}
+\includegraphics[width=\textwidth]{media/Login_successfull.png}
+\end{center}
+\end{minipage}
+
+\begin{minipage}{\textwidth}
+\noindent Jeśli podamy złe dane logowania, dostajemy komunikat:
+\begin{center}
+\includegraphics[width=\textwidth]{media/Login_invalidCredentials.png}
+\end{center}
+\end{minipage}
+
+\begin{minipage}{\textwidth}
+\noindent Możemy również zarejestrować nowego pracownika:
+\begin{center}
+\includegraphics[width=\textwidth]{media/Login_register.png}
+\end{center}
+\end{minipage}
+
+\begin{minipage}{\textwidth}
+\noindent Po podaniu poprawnych danych, pracownik zostaje dodany do listy wszystkich zarejestrowanych pracowników:
+\begin{center}
+\includegraphics[width=\textwidth]{media/Login_registrationSuccessfull.png}
+\end{center}
+\end{minipage}
+
+\begin{minipage}{\textwidth}
+\noindent W przypadku, gdy dane nie są poprawne, dostajemy komunikat:
+\begin{center}
+\includegraphics[width=\textwidth]{media/Login_uniqueNumber.png}
+\end{center}
+\end{minipage}
+
+\newpage
+\subsection{Expenses}
+\begin{minipage}{\textwidth}
+\noindent Po wciśnięciu przycisku \textbf{Expenses}:
+\begin{center}
+\includegraphics[width=\textwidth]{media/Expenses.png}
+\end{center}
+\end{minipage}
+
+\begin{minipage}{\textwidth}
+\noindent Przenosimy się do panelu wydatków:
+\begin{center}
+\includegraphics[width=\textwidth]{media/Expenses_in.png}
+\end{center}
+\end{minipage}
+
+\begin{minipage}{\textwidth}
+\noindent Mamy możliwość dodana nowego wydatku:
+\begin{center}
+\includegraphics[width=\textwidth]{media/Expenses_input.png}
+\end{center}
+\end{minipage}
+
+\begin{minipage}{\textwidth}
+\noindent Po wciśniąciu przycisku \textbf{Add}, wydatek zostaje dodany do listy:
+\begin{center}
+\includegraphics[width=\textwidth]{media/Expenses_add.png}
+\end{center}
+\end{minipage}
+
+\begin{minipage}{\textwidth}
+\noindent Mamy możliwość edycji dodanego wcześniej wydatku:
+\begin{center}
+\includegraphics[width=\textwidth]{media/Expenses_edit.png}
+\end{center}
+\end{minipage}
+
+\begin{minipage}{\textwidth}
+\noindent Po wciśnięciu przycisku \textbf{Edit}, dane o wybranych wydatku zostają automatycznie uzupełnione w panelu na górze:
+\begin{center}
+\includegraphics[width=\textwidth]{media/Expenses_editValues.png}
+\end{center}
+\end{minipage}
+
+\begin{minipage}{\textwidth}
+\noindent Mamy teraz możliwość edycji danych o wybranym wydatku:
+\begin{center}
+\includegraphics[width=\textwidth]{media/Expenses_newValues.png}
+\end{center}
+\end{minipage}
+
+\begin{minipage}{\textwidth}
+\noindent Po ponownym wciśnięciu przysku \textbf{Edit}, nowe dane zostają zapisane:
+\begin{center}
+\includegraphics[width=\textwidth]{media/Expenses_editSuccessfull.png}
+\end{center}
+\end{minipage}
+
+\begin{minipage}{\textwidth}
+\noindent Jeśli jednak chcemy anulawać edycję danych o wybranym wydatku, możemy wcisnąć przycisk \textbf{Cancel Edit}:
+\begin{center}
+\includegraphics[width=\textwidth]{media/Expenses_cancelEdit.png}
+\end{center}
+\end{minipage}
+
+\begin{minipage}{\textwidth}
+\noindent Mamy również możliwość usunięcia wydatku:
+\begin{center}
+\includegraphics[width=\textwidth]{media/Expenses_delete.png}
+\end{center}
+\end{minipage}
+
+\begin{minipage}{\textwidth}
+\noindent Po wciśnięciu przycisku \textbf{Delete}, wydatek zostaje usunięty:
+\begin{center}
+\includegraphics[width=\textwidth]{media/Expenses_deleteSuccessfull.png}
+\end{center}
+\end{minipage}
+
+\newpage
+\subsection{Incomes}
+\begin{minipage}{\textwidth}
+\noindent Po wciśnięciu przycisku \textbf{Incomes}:
+\begin{center}
+\includegraphics[width=\textwidth]{media/Incomes.png}
+\end{center}
+\end{minipage}
+
+\begin{minipage}{\textwidth}
+\noindent Przenosimy się do panelu wpływów:
+\begin{center}
+\includegraphics[width=\textwidth]{media/Incomes_in.png}
+\end{center}
+\end{minipage}
+
+Panel wpływów oferuje takie same funkcjonalności, jak panel wydatków i jego obsługa jest taka sama.
+
+\newpage
+\subsection{Report}
+\begin{minipage}{\textwidth}
+\noindent Po wciśnięciu przycisku \textbf{Report}:
+\begin{center}
+\includegraphics[width=\textwidth]{media/Reports.png}
+\end{center}
+\end{minipage}
+
+\begin{minipage}{\textwidth}
+\noindent Przenosimy się do panelu, gdzie mamy możliwość podglądu wygenerowanego raportu:
+\begin{center}
+\includegraphics[width=\textwidth]{media/Report_in.png}
+\end{center}
+\end{minipage}
+
+\begin{minipage}{\textwidth}
+\noindent Mamy możliwość sprecyzowania, z którego miesiąca chcemy wygenerować raport (albo ze wszystkich, opcja \textbf{ALL}):
+\begin{center}
+\includegraphics[width=\textwidth]{media/Report_month.png}
+\end{center}
+\end{minipage}
+
+\begin{minipage}{\textwidth}
+\noindent Tak jak i analogiczną możliwość sprecyzowania roku:
+\begin{center}
+\includegraphics[width=\textwidth]{media/Reports_year.png}
+\end{center}
+\end{minipage}
+
+\begin{minipage}{\textwidth}
+\noindent Mamy również możliwość zapisania wyników raportu do pliku csv, za pomocą przysku \textbf{Save}:
+\begin{center}
+\includegraphics[width=\textwidth]{media/Reports_save.png}
+\end{center}
+\end{minipage}
+
+\begin{minipage}{\textwidth}
+\noindent Po jego wciśnięciu, dostajemy komunikat:
+\begin{center}
+\includegraphics[width=\textwidth]{media/Reports_saved.png}
+\end{center}
+\end{minipage}
+
+\newpage
+\subsection{Niezalogowany pracownik}
+\begin{minipage}{\textwidth}
+\noindent Jeśli pracownik nie zaloguje się na żadne konto, nie będzie miał on dostępu do funkcjonalności oprogramowania:
+\begin{center}
+\includegraphics[width=\textwidth]{media/NotLoggenIn.png}
+\end{center}
+\end{minipage}
 
 \newpage
 \section{Dyskusja zrealizowanych technik}
