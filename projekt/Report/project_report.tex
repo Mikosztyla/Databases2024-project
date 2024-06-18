@@ -10,6 +10,7 @@
 \usepackage{float}
 \usepackage{graphicx}
 \usepackage{enumitem}
+\usepackage{geometry}
 
 \title{\includegraphics[width=0.2\textwidth]{agh.jpg} \\ \textbf{MongoDB projekt}}
 \author{Mikołaj Gosztyła, Michał Dydek}
@@ -76,7 +77,6 @@ Aplikacja obsługuje restaurację i niektóre działania, które mogłyby być p
 Zdecydowalismy się na stworzenie oprogramowania od strony pracowniczej, a nie dla klientów ponieważ jako pracownik mamy większą kontrolę nad wprowadzanymi danymi.
 
 \subsection{Techniki wykorzystane do realizacji}
-todo: screeny frontendu, backendu
 \begin{itemize}
 	\item Front-End - do realizacji front-endu wykorzystaliśmy język JavaScript, a także wykorzystaliśmy framework React
 	\item Backend - backend realizuje skrypt napisany również w JavaScripcie przy użyciu frameworka Express, a do komunikacji z bazą danych został użyty framework Mongoose
@@ -161,7 +161,6 @@ const resSchema = new mongoose.Schema({
 \begin{samepage}
 \subsection{Kolekcja expenses}
 Kolekcja, w której przechowywane są wydatki firmowe i każdy z pracowników ma możliwośc wprowadzenia danych, które są wykorzystywane w raporcie.
-todo: zdjęcie danych
 \begin{lstlisting}[caption={Expenses}]
 const expenseSchema = new mongoose.Schema({
 	employee_number: { type: Number, required: true },
@@ -200,7 +199,7 @@ todo: opis cruda
 \begin{samepage}
 \subsection{Kolekcja incomes}
 Kolekcja, w której przechowywane są przychody dla firmy i każdy z pracowników ma również możliwośc wprowadzenia danych, które są później wykorzystywane w raporcie.
-todo: zdjęcie danych
+
 \begin{lstlisting}[caption={Incomes}]
 const incomeSchema = new mongoose.Schema({
     employee_number: { type: Number, required: true },
@@ -235,7 +234,7 @@ todo: opis cruda
 \newpage
 \begin{samepage}
 \subsection{Kolekcja properties}
-todo: zdjęcie danych
+
 \begin{lstlisting}[caption={Properties}]
 const propertiesSchema = new mongoose.Schema({
     numberOfTables: { type: Number, required: true },
@@ -270,6 +269,20 @@ const propertiesSchema = new mongoose.Schema({
 \subsection{GET}
 \begin{itemize}
     \item \textbf{\texttt{\textbackslash config}} - pobiera konfigurację restauracji, która znajduje się w folderze \texttt{Config} i pliku \texttt{restaurantProperties.json}
+    \begin{lstlisting}[
+    basicstyle=\scriptsize\ttfamily,
+    xleftmargin=0pt,
+    breaklines=true
+]
+app.get('/config', async (req, res) => {
+    try {
+        const config = await Properties.find();
+        res.json(config);
+    } catch (error) {
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+\end{lstlisting}
     \item \textbf{\texttt{\textbackslash employees}} - pobiera listę wszystkich pracowników, bez hasła należącego do nich konta
     \item \textbf{\texttt{\textbackslash reservations}} - pobiera listę wszystkich rezerwacji
     \item \textbf{\texttt{\textbackslash expensesList}} - pobiera listę wszystkich wydatków
@@ -281,8 +294,99 @@ const propertiesSchema = new mongoose.Schema({
 \begin{itemize}
     \item \textbf{\texttt{\textbackslash employeeAdd}} - dodaje nowego pracownika
     \item \textbf{\texttt{\textbackslash login}} - loguje pracownika na jego konto
+\begin{lstlisting}[
+    basicstyle=\scriptsize\ttfamily,
+    xleftmargin=0pt,
+    breaklines=true
+]
+app.post("/login", async (req, res) => {
+    try {
+        const { employee_number, password } = req.body;
+        const employee = await Employee.findOne({ employee_number });
+
+        if (!employee) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        if (employee.password === password) {
+            res.status(200).json({ id: employee.employee_number });
+        } else {
+            res.status(401).json({ message: 'Invalid credentials' });
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+\end{lstlisting}
     \item \textbf{\texttt{\textbackslash deleteAccount}} - usuwa konto pracownika
+    \newpage
     \item \textbf{\texttt{\textbackslash res}} - dodaje nową rezerwację
+\begin{lstlisting}[
+    basicstyle=\scriptsize\ttfamily,
+    xleftmargin=0pt,
+    breaklines=true
+]
+app.post("/res", async (req, res) => {
+try {
+    const { employee_id, date, time, duration, table } = req.body;
+
+    if (!employee_id || !date || !time || !duration || !table) {
+        return res.status(400).json({ message: 'All fields are required' });
+    }
+
+    const reservationDateTime = new Date(date);
+    const [hour, minute] = time.split(':').map(Number);
+    reservationDateTime.setHours(hour, minute);
+    const endTime = new Date(reservationDateTime);
+    const additionalMinutes = duration * 60;
+    endTime.setMinutes(endTime.getMinutes() + additionalMinutes);
+
+    const currentDate = new Date();
+    if (reservationDateTime <= currentDate) {
+        return res.status(400).json({ message: 'Please select a future date for reservation.' });
+    }
+
+    const properties = await Properties.findOne({});
+    if (properties) {
+        const [closingHour, closingMinute] = properties.closingTime.split(':').map(Number);
+        const closingDate = new Date(reservationDateTime);
+        closingDate.setHours(closingHour);
+        closingDate.setMinutes(closingMinute);
+
+        if (closingDate < endTime) {
+            return res.status(400).json({ message: `End time cannot exceed closing time: ${properties.closingTime}` });
+        }
+    }
+
+    const existingReservations = await Res.find({ date, table });
+
+    for (const existingRes of existingReservations) {
+        const existingStart = new Date(existingRes.date);
+        const [existingHour, existingMinute] = existingRes.time.split(':').map(Number);
+        existingStart.setHours(existingHour, existingMinute);
+        const existingEnd = new Date(existingStart);
+        existingEnd.setMinutes(existingEnd.getMinutes() + existingRes.duration * 60);
+
+        if (
+            (reservationDateTime >= existingStart && reservationDateTime < existingEnd) ||
+            (endTime > existingStart && endTime <= existingEnd) ||
+            (reservationDateTime <= existingStart && endTime >= existingEnd)
+        ) {
+            return res.status(400).json({ message: 'The selected time overlaps with an existing reservation.' });
+        }
+    }
+
+    const newRes = new Res(req.body);
+    await newRes.save();
+    res.status(201).json({ message: 'Reservation successful' });
+} catch (error) {
+    console.error(error);
+    res.status(400).json({ message: 'Reservation not successful', error: error.message });
+}
+});
+\end{lstlisting}
+\normalsize
     \item \textbf{\texttt{\textbackslash expense}} - dodaje nowy wydatek
     \item \textbf{\texttt{\textbackslash income}} - dodaje nowy dochód
     \item \textbf{\texttt{\textbackslash saveTurnoverData}} - zapisuje raport do pliku data.csv
@@ -292,6 +396,31 @@ const propertiesSchema = new mongoose.Schema({
 \subsection{PUT}
 \begin{itemize}
     \item \textbf{\texttt{\textbackslash expenses \textbackslash}} - aktualizuje wydatek o podanym ID
+\begin{lstlisting}[
+    basicstyle=\scriptsize\ttfamily,
+    xleftmargin=0pt,
+    breaklines=true
+]
+app.put('/expenses/:id', async (req, res) => {
+    try {
+        const expense = await Expense.findById(req.params.id);
+        if (!expense) {
+            return res.status(404).json({ message: 'Expense not found' });
+        }
+
+        expense.employee_number = req.body.employee_number || expense.employee_number;
+        expense.item = req.body.item || expense.item;
+        expense.quantity = req.body.quantity || expense.quantity;
+        expense.unit_price = req.body.price || expense.price;
+        expense.date = req.body.date || expense.date;
+
+        const updatedExpense = await expense.save();
+        res.json(updatedExpense);
+    } catch (err) {
+        res.status(400).json({ message: err.message });
+    }
+});
+\end{lstlisting}
     \item \textbf{\texttt{\textbackslash incomes \textbackslash}} - aktualizuje dochód o podanym ID
 \end{itemize}
 
@@ -300,6 +429,25 @@ const propertiesSchema = new mongoose.Schema({
 \begin{itemize}
     \item \textbf{\texttt{\textbackslash reservations \textbackslash}} - usuwa rezerwację o podanym ID
     \item \textbf{\texttt{\textbackslash expenses \textbackslash}} - usuwa wydatek o podanym ID
+\begin{lstlisting}[
+    basicstyle=\scriptsize\ttfamily,
+    xleftmargin=0pt,
+    breaklines=true
+]
+app.delete('/expenses/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const deletedExpense = await Expense.findByIdAndDelete(id);
+        if (!deletedExpense) {
+            return res.status(404).json({ message: 'Expense not found' });
+        }
+        res.status(200).json({ message: 'Expense deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting expense:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+\end{lstlisting}
     \item \textbf{\texttt{\textbackslash incomes \textbackslash}} - usuwa dochód o podanym ID
 \end{itemize}
 
@@ -687,7 +835,5 @@ Podczas dodawania nowej rezerwacji, by nie przechowywać zbędnych starych rezer
 
 \subsection{Możliwość zapisu raportu}
 Nasza aplikacja wspiera zapisywanie wygenerowanego raportu do pliku .csv, który można potem łatwo analizować i obrabiać. Zdecydowaliśmy się na to, ponieważ uważamy, że samo wyświetlanie się danych nie byłoby wystarczające dla klienta i na pewno takie usprawnienie zwiększa wygodę używania aplikacji.
-
-todo: jescze jakies jedno by sie przydalo
 
 \end{document}
