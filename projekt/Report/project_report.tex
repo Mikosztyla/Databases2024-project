@@ -134,6 +134,7 @@ const resSchema = new mongoose.Schema({
 });
 \end{lstlisting}
 \end{samepage}
+Opis pól w kolekcji:
 
 \begin{itemize}
 	\item \textbf{employee id} - numer pracownika, który dokonał rezerwacji
@@ -171,8 +172,14 @@ const expenseSchema = new mongoose.Schema({
 });
 \end{lstlisting}
 Jest to kolekcja, na której wykonywane są wszystkie operacje CRUD.
-todo: opis cruda
+\begin{itemize}
+	\item create - można dodawać nowe dane o wydatkach 
+	\item read - z panelu pracownika możemy wypisać dane z tabeli
+	\item update - każdy wydatek jesteśmy w stanie edytować
+	\item delete - istnieje również możliwość usunięcia wydatku
+\end{itemize}
 \end{samepage}
+Opis pól w kolekcji:
 
 \begin{itemize}
 	\item \textbf{employee number} - numer pracownika, który zerejestrował wydatek
@@ -209,8 +216,14 @@ const incomeSchema = new mongoose.Schema({
 });
 \end{lstlisting}
 Jest to kolekcja, na której wykonywane są wszystkie operacje CRUD.
-todo: opis cruda
+\begin{itemize}
+	\item create - można dodawać nowe dane o przychodach 
+	\item read - z panelu pracownika możemy mieć dostęp do danych z kolekcji
+	\item update - każdy przychód jesteśmy w stanie edytować
+	\item delete - istnieje również możliwość usunięcia przychodu
+\end{itemize}
 \end{samepage}
+Opis pól w kolekcji:
 
 \begin{itemize}
 	\item \textbf{employee number} - numer pracownika, który zerejestrował wpływ
@@ -244,6 +257,7 @@ const propertiesSchema = new mongoose.Schema({
 });
 \end{lstlisting}
 \end{samepage}
+Opis pól w kolekcji:
 
 \begin{itemize}
 	\item \textbf{numberOfTables} - ilość stolików w restauracji
